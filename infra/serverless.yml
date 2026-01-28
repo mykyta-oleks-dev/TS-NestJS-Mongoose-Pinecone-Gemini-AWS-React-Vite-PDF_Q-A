@@ -1,0 +1,98 @@
+org: mykyo
+app: aws-test-task-3
+service: pdf-rag-infra
+
+plugins:
+  - serverless-step-functions
+
+build:
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: true
+    target: node20
+    platform: node
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+  stage: dev
+  environment:
+    PDF_BUCKET_NAME: mykyo-${self:service}-pdf-${self:provider.stage}
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+          Resource:
+            - arn:aws:s3:::${self:provider.environment.PDF_BUCKET_NAME}/*
+        - Effect: Allow
+          Action:
+            - states:StartExecution
+          Resource: "*"
+
+functions:
+  extractText:
+    handler: handlers/extractText.handler
+    timeout: 30
+    memorySize: 512
+
+stepFunctions:
+  stateMachines:
+    PdfProcessingStateMachine:
+      name: pdf-processing-${self:provider.stage}
+      definition:
+        StartAt: ExtractText
+        States:
+          ExtractText:
+            Type: Task
+            Resource:
+              Fn::GetAtt: [ExtractTextLambdaFunction, Arn]
+            End: true
+      events:
+        - eventBridge:
+            enabled: true
+            event:
+              source:
+                - aws.s3
+              detail-type:
+                - Object Created
+              detail:
+                bucket:
+                  name:
+                    - ${self:provider.environment.PDF_BUCKET_NAME}
+                object:
+                  key:
+                    - suffix: .pdf
+
+resources:
+  Resources:
+    PdfUploadBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.PDF_BUCKET_NAME}
+        NotificationConfiguration:
+          EventBridgeConfiguration:
+            EventBridgeEnabled: true
+
+    EventBridgeInvokeRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: events.amazonaws.com
+              Action: sts:AssumeRole
+        Policies:
+          - PolicyName: StartStepFunction
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action: states:StartExecution
+                  Resource: "*"
