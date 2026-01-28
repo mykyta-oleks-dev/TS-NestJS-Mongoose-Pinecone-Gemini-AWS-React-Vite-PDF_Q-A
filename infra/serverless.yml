@@ -20,6 +20,7 @@ provider:
   stage: dev
   environment:
     PDF_BUCKET_NAME: mykyo-${self:service}-pdf-${self:provider.stage}
+    GEMINI_API_KEY: ${ssm:/infra/${self:provider.stage}/gemini/apiKey}
 
   iam:
     role:
@@ -33,6 +34,11 @@ provider:
           Action:
             - states:StartExecution
           Resource: "*"
+        - Effect: Allow
+          Action:
+            - ssm:GetParameter
+          Resource:
+            - arn:aws:ssm:${self:provider.region}:*:parameter/infra/${self:provider.stage}/gemini/*
 
 functions:
   extractText:
@@ -44,6 +50,10 @@ functions:
     handler: handlers/chunkText.handler
     timeout: 30
     memorySize: 512
+
+  embedding:
+    handler: handlers/embedding.handler
+    timeout: 120
 
   error:
     handler: handlers/error.handler
@@ -69,6 +79,16 @@ stepFunctions:
             Type: Task
             Resource:
               Fn::GetAtt: [ChunkTextLambdaFunction, Arn]
+            Next: ChunksEmbedding
+            Catch:
+              - ErrorEquals: ["States.ALL"]
+                ResultPath: "$.errorInfo"
+                Next: UpdateStatusError
+
+          ChunksEmbedding:
+            Type: Task
+            Resource:
+              Fn::GetAtt: [EmbeddingLambdaFunction, Arn]
             End: true
             Catch:
               - ErrorEquals: ["States.ALL"]

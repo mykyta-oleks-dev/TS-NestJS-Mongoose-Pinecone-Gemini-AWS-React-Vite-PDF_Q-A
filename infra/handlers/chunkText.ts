@@ -1,9 +1,14 @@
 import { chunk } from 'llm-chunk';
+import { ExtractReturn } from '../shared/types/extract.types';
+import { ChunkReturn } from '../shared/types/chunk.types';
 
 const MAX_TOKENS = 500;
 const OVERLAP = 50;
 
-export const handler = async ({ key, text }: { key: string; text: string }) => {
+export const handler = async ({
+	key,
+	text,
+}: ExtractReturn): Promise<ChunkReturn> => {
 	if (!text) {
 		throw new Error('No text provided for chunking');
 	}

@@ -1,6 +1,7 @@
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { Readable } from 'node:stream';
 import { extractText, getDocumentProxy } from 'unpdf';
+import { ExtractReturn } from '../shared/types/extract.types';
 
 const s3 = new S3Client({});
 
@@ -21,9 +22,9 @@ const extractPdf = async (buffer: Buffer) => {
 	return { totalPages, text };
 };
 
-export const handler = async (event: any) => {
-	const bucket = event.detail.bucket.name;
-	const key = event.detail.object.key;
+export const handler = async (input: any): Promise<ExtractReturn> => {
+	const bucket = input.detail.bucket.name as string;
+	const key = input.detail.object.key as string;
 
 	const response = await s3.send(
 		new GetObjectCommand({ Bucket: bucket, Key: key }),
