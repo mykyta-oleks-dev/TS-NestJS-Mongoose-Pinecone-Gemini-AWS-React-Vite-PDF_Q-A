@@ -22,12 +22,8 @@ const extractPdf = async (buffer: Buffer) => {
 };
 
 export const handler = async (event: any) => {
-	console.log('Incoming event:', JSON.stringify(event, null, 2));
-
 	const bucket = event.detail.bucket.name;
 	const key = event.detail.object.key;
-
-	console.log(`Processing file: s3://${bucket}/${key}`);
 
 	const response = await s3.send(
 		new GetObjectCommand({ Bucket: bucket, Key: key }),
@@ -37,11 +33,9 @@ export const handler = async (event: any) => {
 
 	const { text } = await extractPdf(buffer);
 
-	console.log('File text:', text);
-
 	return {
 		bucket,
 		key,
-		status: 'TEXT_EXTRACTION_PLACEHOLDER',
+		text,
 	};
 };

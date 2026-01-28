@@ -7,6 +7,7 @@
 	"license": "ISC",
 	"dependencies": {
 		"@aws-sdk/client-s3": "^3.975.0",
+		"llm-chunk": "^0.0.1",
 		"unpdf": "^1.4.0"
 	},
 	"devDependencies": {

@@ -40,6 +40,11 @@ functions:
     timeout: 30
     memorySize: 512
 
+  chunkText:
+    handler: handlers/chunkText.handler
+    timeout: 30
+    memorySize: 512
+
 stepFunctions:
   stateMachines:
     PdfProcessingStateMachine:
@@ -51,7 +56,14 @@ stepFunctions:
             Type: Task
             Resource:
               Fn::GetAtt: [ExtractTextLambdaFunction, Arn]
+            Next: ChunkText
+
+          ChunkText:
+            Type: Task
+            Resource:
+              Fn::GetAtt: [ChunkTextLambdaFunction, Arn]
             End: true
+
       events:
         - eventBridge:
             enabled: true
