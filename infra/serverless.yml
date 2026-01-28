@@ -45,6 +45,9 @@ functions:
     timeout: 30
     memorySize: 512
 
+  error:
+    handler: handlers/error.handler
+
 stepFunctions:
   stateMachines:
     PdfProcessingStateMachine:
@@ -57,11 +60,25 @@ stepFunctions:
             Resource:
               Fn::GetAtt: [ExtractTextLambdaFunction, Arn]
             Next: ChunkText
+            Catch:
+              - ErrorEquals: ["States.ALL"]
+                ResultPath: "$.errorInfo"
+                Next: UpdateStatusError
 
           ChunkText:
             Type: Task
             Resource:
               Fn::GetAtt: [ChunkTextLambdaFunction, Arn]
+            End: true
+            Catch:
+              - ErrorEquals: ["States.ALL"]
+                ResultPath: "$.errorInfo"
+                Next: UpdateStatusError
+
+          UpdateStatusError:
+            Type: Task
+            Resource:
+              Fn::GetAtt: [ErrorLambdaFunction, Arn]
             End: true
 
       events:
