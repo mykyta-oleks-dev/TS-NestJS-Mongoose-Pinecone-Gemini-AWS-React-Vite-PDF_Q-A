@@ -29,7 +29,7 @@ const embedText = async (text: string) => {
 
 export const handler = async ({
 	key,
-	prefix,
+	user,
 	chunks,
 }: ChunkReturn): Promise<EmbeddingReturn> => {
 	if (!chunks || !Array.isArray(chunks)) {
@@ -57,7 +57,7 @@ export const handler = async ({
 
 	return {
 		key,
-		prefix,
+		user,
 		vectors,
 	};
 };

@@ -32,14 +32,17 @@ export const handler = async (input: any): Promise<ExtractReturn> => {
 		);
 	}
 
-	const lastSlashIdx = key.lastIndexOf('/');
+	const keyParts = key.split('/');
 
-	if (lastSlashIdx === -1) {
-		throw new Error('The key has to have a user prefix.');
+	const docsPrefix = keyParts[0];
+	const user = keyParts[1];
+	const fileName = keyParts[2];
+
+	if (docsPrefix !== 'docs' || !fileName || keyParts.length > 3) {
+		throw new Error(
+			'The key expected to be in format docs/{userEmail}/{fileName}',
+		);
 	}
-
-	const prefix = key.substring(0, lastSlashIdx);
-	const fileName = key.substring(lastSlashIdx + 1);
 
 	const response = await s3.send(
 		new GetObjectCommand({ Bucket: bucket, Key: key }),
@@ -52,7 +55,7 @@ export const handler = async (input: any): Promise<ExtractReturn> => {
 	return {
 		bucket,
 		key,
-		prefix,
+		user,
 		fileName,
 		text,
 	};

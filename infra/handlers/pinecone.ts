@@ -37,7 +37,7 @@ const clear = async (user: string) => {
 
 export const handler = async ({
 	key,
-	prefix: user,
+	user,
 	vectors,
 }: EmbeddingReturn): Promise<PineconeReturn> => {
 	init();

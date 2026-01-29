@@ -134,7 +134,7 @@ stepFunctions:
                     - ${self:provider.environment.PDF_BUCKET_NAME}
                 object:
                   key:
-                    - suffix: .pdf
+                    - wildcard: docs/*/*.pdf
 
 resources:
   Resources:

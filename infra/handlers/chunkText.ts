@@ -7,7 +7,7 @@ const OVERLAP = 50;
 
 export const handler = async ({
 	key,
-	prefix,
+	user,
 	text,
 }: ExtractReturn): Promise<ChunkReturn> => {
 	if (!text) {
@@ -23,7 +23,7 @@ export const handler = async ({
 
 	return {
 		chunks,
-		prefix,
+		user,
 		key,
 	};
 };

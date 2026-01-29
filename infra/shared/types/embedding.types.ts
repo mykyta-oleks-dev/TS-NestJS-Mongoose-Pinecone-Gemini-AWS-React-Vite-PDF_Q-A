@@ -9,6 +9,6 @@ export type Vector = {
 
 export type EmbeddingReturn = {
 	key: string;
-	prefix: string;
+	user: string;
 	vectors: Vector[];
 };

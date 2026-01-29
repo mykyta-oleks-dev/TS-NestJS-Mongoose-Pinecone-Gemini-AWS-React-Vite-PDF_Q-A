@@ -1,7 +1,7 @@
 export type ExtractReturn = {
 	bucket: string;
 	key: string;
-	prefix: string;
+	user: string;
 	fileName: string;
 	text: string;
 };
