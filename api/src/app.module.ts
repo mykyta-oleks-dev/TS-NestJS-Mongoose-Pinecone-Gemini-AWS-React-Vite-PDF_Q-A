@@ -11,6 +11,7 @@ import { TypedConfigService } from './shared/types/config-service.types';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MongooseConfig } from './shared/config/mongoose.config';
 import { Connection } from 'mongoose';
+import { DocumentsModule } from './modules/documents/documents.module';
 
 @Module({
 	imports: [
@@ -29,6 +30,7 @@ import { Connection } from 'mongoose';
 			inject: [ConfigService],
 		}),
 		S3Module,
+		DocumentsModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],
