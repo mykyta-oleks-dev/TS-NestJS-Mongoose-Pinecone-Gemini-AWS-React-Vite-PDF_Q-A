@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { S3Module } from './modules/s3/s3.module';
@@ -12,6 +12,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { MongooseConfig } from './shared/config/mongoose.config';
 import { Connection } from 'mongoose';
 import { DocumentsModule } from './modules/documents/documents.module';
+import { UserEmailMiddleware } from './shared/middlewares/user-email.middleware';
 
 @Module({
 	imports: [
@@ -35,4 +36,8 @@ import { DocumentsModule } from './modules/documents/documents.module';
 	controllers: [AppController],
 	providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+	configure(consumer: MiddlewareConsumer) {
+		consumer.apply(UserEmailMiddleware).forRoutes('*');
+	}
+}
