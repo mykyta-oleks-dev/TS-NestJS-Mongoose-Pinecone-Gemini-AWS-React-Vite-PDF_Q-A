@@ -24,7 +24,22 @@ const extractPdf = async (buffer: Buffer) => {
 
 export const handler = async (input: any): Promise<ExtractReturn> => {
 	const bucket = input.detail.bucket.name as string;
-	const key = input.detail.object.key as string;
+	const key = input.detail.object.key;
+
+	if (!key || typeof key !== 'string') {
+		throw new Error(
+			'The key has to be a string path to the S3 object in the bucket',
+		);
+	}
+
+	const lastSlashIdx = key.lastIndexOf('/');
+
+	if (lastSlashIdx === -1) {
+		throw new Error('The key has to have a user prefix.');
+	}
+
+	const prefix = key.substring(0, lastSlashIdx);
+	const fileName = key.substring(lastSlashIdx + 1);
 
 	const response = await s3.send(
 		new GetObjectCommand({ Bucket: bucket, Key: key }),
@@ -37,6 +52,8 @@ export const handler = async (input: any): Promise<ExtractReturn> => {
 	return {
 		bucket,
 		key,
+		prefix,
+		fileName,
 		text,
 	};
 };

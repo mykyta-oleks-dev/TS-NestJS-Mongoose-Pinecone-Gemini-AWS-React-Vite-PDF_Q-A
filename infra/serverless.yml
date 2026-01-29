@@ -19,8 +19,12 @@ provider:
   region: us-east-1
   stage: dev
   environment:
-    PDF_BUCKET_NAME: mykyo-${self:service}-pdf-${self:provider.stage}
+    PDF_BUCKET_NAME: mykyo-${self:service}-${self:provider.stage}
+
     GEMINI_API_KEY: ${ssm:/infra/${self:provider.stage}/gemini/apiKey}
+
+    PINECONE_API_KEY: ${ssm:/infra/${self:provider.stage}/pinecone/apiKey}
+    PINECONE_INDEX: pdf-rag-${self:provider.stage}
 
   iam:
     role:
@@ -39,6 +43,7 @@ provider:
             - ssm:GetParameter
           Resource:
             - arn:aws:ssm:${self:provider.region}:*:parameter/infra/${self:provider.stage}/gemini/*
+            - arn:aws:ssm:${self:provider.region}:*:parameter/infra/${self:provider.stage}/pinecone/*
 
 functions:
   extractText:
@@ -53,6 +58,10 @@ functions:
 
   embedding:
     handler: handlers/embedding.handler
+    timeout: 120
+
+  writeVectors:
+    handler: handlers/pinecone.handler
     timeout: 120
 
   error:
@@ -89,6 +98,16 @@ stepFunctions:
             Type: Task
             Resource:
               Fn::GetAtt: [EmbeddingLambdaFunction, Arn]
+            Next: VectorsWriting
+            Catch:
+              - ErrorEquals: ["States.ALL"]
+                ResultPath: "$.errorInfo"
+                Next: UpdateStatusError
+
+          VectorsWriting:
+            Type: Task
+            Resource:
+              Fn::GetAtt: [WriteVectorsLambdaFunction, Arn]
             End: true
             Catch:
               - ErrorEquals: ["States.ALL"]

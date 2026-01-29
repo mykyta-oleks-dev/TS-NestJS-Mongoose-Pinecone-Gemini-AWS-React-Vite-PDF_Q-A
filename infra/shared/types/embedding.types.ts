@@ -1,4 +1,4 @@
-export type EmbeddedChunk = {
+export type Vector = {
 	id: string;
 	values: number[];
 	metadata: {
@@ -9,5 +9,6 @@ export type EmbeddedChunk = {
 
 export type EmbeddingReturn = {
 	key: string;
-	vectors: EmbeddedChunk[];
+	prefix: string;
+	vectors: Vector[];
 };

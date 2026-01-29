@@ -1,46 +1,63 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GenerativeModel, GoogleGenerativeAI } from '@google/generative-ai';
 import { ChunkReturn } from '../shared/types/chunk.types';
-import {
-	EmbeddedChunk,
-	EmbeddingReturn,
-} from '../shared/types/embedding.types';
+import { Vector, EmbeddingReturn } from '../shared/types/embedding.types';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+let genAI: GoogleGenerativeAI;
 
-const embeddingModel = genAI.getGenerativeModel({
-	model: 'gemini-embedding-001',
-});
+let embeddingModel: GenerativeModel;
+
+const init = () => {
+	if (genAI && embeddingModel) return;
+
+	const apiKey = process.env.GEMINI_API_KEY;
+
+	if (!apiKey) {
+		throw new Error('Gemini API key is not set in environment variables!');
+	}
+
+	genAI = new GoogleGenerativeAI(apiKey);
+
+	embeddingModel = genAI.getGenerativeModel({
+		model: 'gemini-embedding-001',
+	});
+};
 
 const embedText = async (text: string) => {
 	const result = await embeddingModel.embedContent(text);
-	return result.embedding.values; // number[]
+	return result.embedding.values;
 };
 
 export const handler = async ({
 	key,
+	prefix,
 	chunks,
 }: ChunkReturn): Promise<EmbeddingReturn> => {
 	if (!chunks || !Array.isArray(chunks)) {
 		throw new Error('No chunks provided');
 	}
 
-	const embeddedChunks: EmbeddedChunk[] = [];
+	init();
+
+	const vectors: Vector[] = [];
 
 	for (const [idx, chunk] of chunks.entries()) {
-		const vector = await embedText(chunk);
+		const values = await embedText(chunk);
 
-		embeddedChunks.push({
+		vectors.push({
 			id: `${key}#${idx}`,
-			values: vector,
+			values,
 			metadata: {
 				key,
 				chunkIndex: idx,
 			},
 		});
+
+		console.log([idx, values.length]);
 	}
 
 	return {
 		key,
-		vectors: embeddedChunks,
+		prefix,
+		vectors,
 	};
 };
