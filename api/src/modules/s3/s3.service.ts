@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
-import { TypedConfigService } from '../../shared/types/config-service.types';
+import { Injectable } from '@nestjs/common';
+import { UUID } from 'node:crypto';
 import { AWSConfig } from '../../shared/config/aws.config';
+import { extensions } from '../../shared/constants/document.constants';
+import { TypedConfigService } from '../../shared/types/config-service.types';
 import { FilesContentType } from '../../shared/types/files.types';
 
 @Injectable()
@@ -28,7 +30,7 @@ export class S3Service {
 		this.bucketName = awsConfig.bucketName;
 	}
 
-	public async generatePutPresignedUrl(
+	generatePutPresignedUrl(
 		key: string,
 		contentType: FilesContentType,
 		size: number,
@@ -41,6 +43,10 @@ export class S3Service {
 			ContentLength: size,
 		});
 
-		return await getSignedUrl(this.s3, command, { expiresIn });
+		return getSignedUrl(this.s3, command, { expiresIn });
+	}
+
+	getTmpKey(uuid: UUID, contentType: FilesContentType) {
+		return `tmp/${uuid}${extensions[contentType]}`;
 	}
 }
