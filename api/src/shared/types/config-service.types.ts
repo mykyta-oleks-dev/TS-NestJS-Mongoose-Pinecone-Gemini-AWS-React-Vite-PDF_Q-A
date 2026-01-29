@@ -1,8 +1,10 @@
 import { ConfigService } from '@nestjs/config';
 import { AWSConfig } from '../config/aws.config';
+import { MongooseConfig } from '../config/mongoose.config';
 
-export default interface ConfigType {
+export interface ConfigType {
 	aws: AWSConfig;
+	mongoose: MongooseConfig;
 }
 
-export default class TypedConfigService extends ConfigService<ConfigType> {}
+export class TypedConfigService extends ConfigService<ConfigType> {}

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
-import TypedConfigService from '../../shared/types/config-service.types';
+import { TypedConfigService } from '../../shared/types/config-service.types';
 import { AWSConfig } from '../../shared/config/aws.config';
 import { FilesContentType } from '../../shared/types/files.types';
 
