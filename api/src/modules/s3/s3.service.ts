@@ -10,7 +10,10 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UUID } from 'node:crypto';
 import { AWSConfig } from '../../shared/config/aws.config';
-import { extensions } from '../../shared/constants/files.constants';
+import {
+	extensions,
+	TMP_S3_PREFIX,
+} from '../../shared/constants/files.constants';
 import { TypedConfigService } from '../../shared/types/config-service.types';
 import { FilesContentType } from '../../shared/types/files.types';
 
@@ -53,11 +56,7 @@ export class S3Service {
 		return getSignedUrl(this.client, command, { expiresIn });
 	}
 
-	getTmpKey(uuid: UUID, contentType: FilesContentType) {
-		return `tmp/${uuid}${extensions[contentType]}`;
-	}
-
-	async getFileHead(key: string) {
+	getFileHead(key: string) {
 		return this.tryCatch(() =>
 			this.client.send(
 				new HeadObjectCommand({
@@ -78,13 +77,25 @@ export class S3Service {
 
 			await this.client.send(copyCommand);
 
+			await this.deleteFile(sourceKey);
+		});
+	}
+
+	deleteFile(sourceKey: string) {
+		return this.tryCatch(() => {
 			const deleteCommand = new DeleteObjectCommand({
 				Bucket: this.bucketName,
 				Key: sourceKey,
 			});
 
-			await this.client.send(deleteCommand);
+			return this.client.send(deleteCommand);
 		});
+	}
+
+	// helpers
+
+	getTmpKey(uuid: UUID, contentType: FilesContentType) {
+		return `${TMP_S3_PREFIX}/${uuid}${extensions[contentType]}`;
 	}
 
 	private async tryCatch<ReturnType>(

@@ -1,4 +1,12 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+	Body,
+	Controller,
+	Delete,
+	Get,
+	HttpCode,
+	HttpStatus,
+	Post,
+} from '@nestjs/common';
 import { DocumentsService } from './documents.service';
 import { UseUserEmailGuard } from '../../shared/guards/user-email.guard';
 import { GeneratePresignedUrlDto } from './dto/generate-presigned-url.dto';
@@ -24,5 +32,16 @@ export class DocumentsController {
 		@UserEmail() email: string,
 	) {
 		return this.documentsService.finalizeUpload(body, email);
+	}
+
+	@Get()
+	getCurrentDocument(@UserEmail() email: string) {
+		return this.documentsService.getCurrentDocument(email);
+	}
+
+	@Delete()
+	@HttpCode(HttpStatus.NO_CONTENT)
+	deleteCurrentDocument(@UserEmail() email: string) {
+		return this.documentsService.deleteCurrentDocument(email);
 	}
 }

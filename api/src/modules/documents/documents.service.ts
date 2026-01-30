@@ -2,6 +2,7 @@ import {
 	BadRequestException,
 	ConflictException,
 	Injectable,
+	NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Document } from './schemas/document.schema';
@@ -84,12 +85,36 @@ export class DocumentsService {
 		return { document };
 	}
 
-	getCurrentDocument(userEmail: string) {
-		return this.documentModel.findOne({ userEmail });
+	async getCurrentDocument(userEmail: string) {
+		const document = await this.documentModel.findOne({ userEmail });
+
+		if (!document) {
+			throw new NotFoundException(
+				'There is no document uploaded by the user',
+			);
+		}
+
+		return document;
 	}
 
+	async deleteCurrentDocument(userEmail: string) {
+		const document = await this.getCurrentDocument(userEmail);
+
+		await this.s3.deleteFile(document.key);
+
+		await this.documentModel.deleteOne({ userEmail });
+	}
+
+	// helpers
+
 	async assertNoActiveDocument(userEmail: string) {
-		const existing = await this.getCurrentDocument(userEmail);
+		let existing: Document;
+
+		try {
+			existing = await this.getCurrentDocument(userEmail);
+		} catch {
+			return true;
+		}
 
 		if (existing) {
 			throw new ConflictException('User already has document uploaded');
