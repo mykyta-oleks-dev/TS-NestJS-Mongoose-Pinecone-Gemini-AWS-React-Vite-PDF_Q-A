@@ -15,6 +15,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
 import { DocumentsModule } from './modules/documents/documents.module';
 import { UserEmailMiddleware } from './shared/middlewares/user-email.middleware';
+import { PineconeModule } from './modules/pinecone/pinecone.module';
 
 @Module({
 	imports: [
@@ -34,6 +35,7 @@ import { UserEmailMiddleware } from './shared/middlewares/user-email.middleware'
 		}),
 		S3Module,
 		DocumentsModule,
+		PineconeModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],

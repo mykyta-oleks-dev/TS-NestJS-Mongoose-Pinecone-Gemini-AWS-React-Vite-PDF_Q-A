@@ -9,6 +9,7 @@ import { Global, Module } from '@nestjs/common';
 import { TypedConfigService } from '../types/config-service.types';
 import mongooseConfig from './mongoose.config';
 import infraConfig from './infra.config';
+import pineconeConfig from './pinecone.config';
 
 export const appConfigSchema = Joi.object({
 	AWS_REGION: Joi.string().required(),
@@ -19,11 +20,14 @@ export const appConfigSchema = Joi.object({
 	MONGODB_URL: Joi.string().required(),
 
 	HMAC_SECRET: Joi.string().required(),
+
+	PINECONE_API_KEY: Joi.string().required(),
+	PINECONE_DOCS_INDEX: Joi.string().required(),
 });
 
 export const appConfigOptions: ConfigModuleOptions = {
 	isGlobal: true,
-	load: [awsConfig, mongooseConfig, infraConfig],
+	load: [awsConfig, mongooseConfig, infraConfig, pineconeConfig],
 	validationSchema: appConfigSchema,
 	validationOptions: {
 		allowUnknown: true,
