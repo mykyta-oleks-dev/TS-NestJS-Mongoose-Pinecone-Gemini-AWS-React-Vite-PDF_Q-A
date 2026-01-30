@@ -18,6 +18,9 @@ export class Document {
 
 	@Prop({ enum: statuses, required: true, default: 'pending' })
 	status: Status;
+
+	@Prop()
+	vectorsCount?: number;
 }
 
 export type DocumentDocument = HydratedDocument<Document>;

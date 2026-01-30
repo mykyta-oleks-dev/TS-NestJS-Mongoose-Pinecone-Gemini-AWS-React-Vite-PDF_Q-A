@@ -16,6 +16,7 @@ import {
 	DOCUMENTS_S3_PREFIX,
 } from '../../shared/constants/files.constants';
 import { CreateDocumentDto } from './dto/create-document.dto';
+import { UpdateStatusDto } from './dto/update-status.dto';
 
 @Injectable()
 export class DocumentsService {
@@ -105,9 +106,24 @@ export class DocumentsService {
 		await this.documentModel.deleteOne({ userEmail });
 	}
 
+	updateStatus(body: UpdateStatusDto) {
+		return this.documentModel.findOneAndUpdate(
+			{
+				key: body.key,
+			},
+			{
+				status: body.success ? 'success' : 'error',
+				vectorsCount:
+					body.success && body.vectorsCount
+						? body.vectorsCount
+						: undefined,
+			},
+		);
+	}
+
 	// helpers
 
-	async assertNoActiveDocument(userEmail: string) {
+	private async assertNoActiveDocument(userEmail: string) {
 		let existing: Document;
 
 		try {

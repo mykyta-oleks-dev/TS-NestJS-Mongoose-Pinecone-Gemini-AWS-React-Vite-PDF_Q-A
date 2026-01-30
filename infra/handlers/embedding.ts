@@ -49,10 +49,9 @@ export const handler = async ({
 			metadata: {
 				key,
 				chunkIndex: idx,
+				text: chunk,
 			},
 		});
-
-		console.log([idx, values.length]);
 	}
 
 	return {

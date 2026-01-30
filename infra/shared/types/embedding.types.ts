@@ -4,6 +4,7 @@ export type Vector = {
 	metadata: {
 		key: string;
 		chunkIndex: number;
+		text: string;
 	};
 };
 
