@@ -28,4 +28,8 @@ export class PineconeService {
 			topK: 5,
 		});
 	}
+
+	delete(indexName: string, namespace: string) {
+		return this.client.index(indexName).namespace(namespace).deleteAll();
+	}
 }

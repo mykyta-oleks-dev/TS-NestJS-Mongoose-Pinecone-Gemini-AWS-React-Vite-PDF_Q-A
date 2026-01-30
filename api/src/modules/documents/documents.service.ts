@@ -17,14 +17,31 @@ import {
 } from '../../shared/constants/files.constants';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
+import { PineconeService } from '../pinecone/pinecone.service';
+import {
+	PineconeConfig,
+	TypedConfigService,
+} from '../../shared/types/config-service.types';
 
 @Injectable()
 export class DocumentsService {
+	private readonly documentsIndex: string;
+
 	constructor(
 		@InjectModel(Document.name)
 		private readonly documentModel: Model<Document>,
 		private readonly s3: S3Service,
-	) {}
+		private readonly pinecone: PineconeService,
+		private readonly configService: TypedConfigService,
+	) {
+		const pineconeConfig = configService.get<PineconeConfig>('pinecone');
+
+		if (!pineconeConfig) {
+			throw new Error('Pinecone configuration is missing');
+		}
+
+		this.documentsIndex = pineconeConfig.documentsIndex;
+	}
 
 	async generatePutPresignedUrl(
 		body: GeneratePresignedUrlDto,
@@ -104,6 +121,8 @@ export class DocumentsService {
 		await this.s3.deleteFile(document.key);
 
 		await this.documentModel.deleteOne({ userEmail });
+
+		await this.pinecone.delete(this.documentsIndex, userEmail);
 	}
 
 	updateStatus(body: UpdateStatusDto) {

@@ -10,6 +10,7 @@ import { TypedConfigService } from '../types/config-service.types';
 import mongooseConfig from './mongoose.config';
 import infraConfig from './infra.config';
 import pineconeConfig from './pinecone.config';
+import geminiConfig from './gemini.config';
 
 export const appConfigSchema = Joi.object({
 	AWS_REGION: Joi.string().required(),
@@ -23,11 +24,19 @@ export const appConfigSchema = Joi.object({
 
 	PINECONE_API_KEY: Joi.string().required(),
 	PINECONE_DOCS_INDEX: Joi.string().required(),
+
+	GEMINI_API_KEY: Joi.string().required(),
 });
 
 export const appConfigOptions: ConfigModuleOptions = {
 	isGlobal: true,
-	load: [awsConfig, mongooseConfig, infraConfig, pineconeConfig],
+	load: [
+		awsConfig,
+		mongooseConfig,
+		infraConfig,
+		pineconeConfig,
+		geminiConfig,
+	],
 	validationSchema: appConfigSchema,
 	validationOptions: {
 		allowUnknown: true,

@@ -21,11 +21,16 @@ export interface PineconeConfig {
 	documentsIndex: string;
 }
 
+export interface GeminiConfig {
+	apiKey: string;
+}
+
 export interface ConfigType {
 	aws: AWSConfig;
 	mongoose: MongooseConfig;
 	infra: InfraConfig;
 	pinecone: PineconeConfig;
+	gemini: GeminiConfig;
 }
 
 export class TypedConfigService extends ConfigService<ConfigType> {}

@@ -16,6 +16,7 @@ import { Connection } from 'mongoose';
 import { DocumentsModule } from './modules/documents/documents.module';
 import { UserEmailMiddleware } from './shared/middlewares/user-email.middleware';
 import { PineconeModule } from './modules/pinecone/pinecone.module';
+import { GeminiModule } from './modules/gemini/gemini.module';
 
 @Module({
 	imports: [
@@ -36,6 +37,7 @@ import { PineconeModule } from './modules/pinecone/pinecone.module';
 		S3Module,
 		DocumentsModule,
 		PineconeModule,
+		GeminiModule,
 	],
 	controllers: [AppController],
 	providers: [AppService],
