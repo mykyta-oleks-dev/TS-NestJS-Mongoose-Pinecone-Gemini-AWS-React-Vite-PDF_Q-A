@@ -8,6 +8,7 @@ import awsConfig from './aws.config';
 import { Global, Module } from '@nestjs/common';
 import { TypedConfigService } from '../types/config-service.types';
 import mongooseConfig from './mongoose.config';
+import infraConfig from './infra.config';
 
 export const appConfigSchema = Joi.object({
 	AWS_REGION: Joi.string().required(),
@@ -16,11 +17,13 @@ export const appConfigSchema = Joi.object({
 	AWS_SECRET_ACCESS_KEY: Joi.string().required(),
 
 	MONGODB_URL: Joi.string().required(),
+
+	HMAC_SECRET: Joi.string().required(),
 });
 
 export const appConfigOptions: ConfigModuleOptions = {
 	isGlobal: true,
-	load: [awsConfig, mongooseConfig],
+	load: [awsConfig, mongooseConfig, infraConfig],
 	validationSchema: appConfigSchema,
 	validationOptions: {
 		allowUnknown: true,

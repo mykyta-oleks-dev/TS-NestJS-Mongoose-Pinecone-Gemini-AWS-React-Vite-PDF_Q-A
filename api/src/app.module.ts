@@ -7,9 +7,11 @@ import {
 	appConfigOptions,
 	TypedConfigModule,
 } from './shared/config/app.config';
-import { TypedConfigService } from './shared/types/config-service.types';
+import {
+	TypedConfigService,
+	MongooseConfig,
+} from './shared/types/config-service.types';
 import { MongooseModule } from '@nestjs/mongoose';
-import { MongooseConfig } from './shared/config/mongoose.config';
 import { Connection } from 'mongoose';
 import { DocumentsModule } from './modules/documents/documents.module';
 import { UserEmailMiddleware } from './shared/middlewares/user-email.middleware';

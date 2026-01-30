@@ -1,11 +1,5 @@
 import { registerAs } from '@nestjs/config';
-
-export interface AWSConfig {
-	region: string;
-	bucketName: string;
-	accessKeyId: string;
-	secretAccessKey: string;
-}
+import { AWSConfig } from '../types/config-service.types';
 
 const awsConfig = registerAs(
 	'aws',

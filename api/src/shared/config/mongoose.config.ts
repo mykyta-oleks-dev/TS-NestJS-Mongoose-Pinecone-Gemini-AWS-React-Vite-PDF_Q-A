@@ -1,8 +1,5 @@
 import { registerAs } from '@nestjs/config';
-
-export interface MongooseConfig {
-	dbUri?: string;
-}
+import { MongooseConfig } from '../types/config-service.types';
 
 const mongooseConfig = registerAs(
 	'mongoose',

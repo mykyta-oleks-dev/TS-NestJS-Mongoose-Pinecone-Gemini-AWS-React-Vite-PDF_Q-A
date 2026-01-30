@@ -9,12 +9,14 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UUID } from 'node:crypto';
-import { AWSConfig } from '../../shared/config/aws.config';
 import {
 	extensions,
 	TMP_S3_PREFIX,
 } from '../../shared/constants/files.constants';
-import { TypedConfigService } from '../../shared/types/config-service.types';
+import {
+	AWSConfig,
+	TypedConfigService,
+} from '../../shared/types/config-service.types';
 import { FilesContentType } from '../../shared/types/files.types';
 
 @Injectable()

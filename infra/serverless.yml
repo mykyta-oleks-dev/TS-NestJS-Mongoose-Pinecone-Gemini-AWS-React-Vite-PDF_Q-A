@@ -26,6 +26,10 @@ provider:
     PINECONE_API_KEY: ${ssm:/infra/${self:provider.stage}/pinecone/apiKey}
     PINECONE_INDEX: pdf-rag-${self:provider.stage}
 
+    HMAC_SECRET: ${ssm:/infra/${self:provider.stage}/hmac}
+
+    API_URL: ${ssm:/infra/${self:provider.stage}/apiUrl}
+
   iam:
     role:
       statements:
@@ -44,6 +48,8 @@ provider:
           Resource:
             - arn:aws:ssm:${self:provider.region}:*:parameter/infra/${self:provider.stage}/gemini/*
             - arn:aws:ssm:${self:provider.region}:*:parameter/infra/${self:provider.stage}/pinecone/*
+            - arn:aws:ssm:${self:provider.region}:*:parameter/infra/${self:provider.stage}/hmac
+            - arn:aws:ssm:${self:provider.region}:*:parameter/infra/${self:provider.stage}/apiUrl
 
 functions:
   extractText:
@@ -64,8 +70,8 @@ functions:
     handler: handlers/pinecone.handler
     timeout: 120
 
-  error:
-    handler: handlers/error.handler
+  end:
+    handler: handlers/end.handler
 
 stepFunctions:
   stateMachines:
@@ -81,8 +87,8 @@ stepFunctions:
             Next: ChunkText
             Catch:
               - ErrorEquals: ["States.ALL"]
-                ResultPath: "$.errorInfo"
-                Next: UpdateStatusError
+                ResultPath: "$.error"
+                Next: UpdateStatus
 
           ChunkText:
             Type: Task
@@ -91,8 +97,8 @@ stepFunctions:
             Next: ChunksEmbedding
             Catch:
               - ErrorEquals: ["States.ALL"]
-                ResultPath: "$.errorInfo"
-                Next: UpdateStatusError
+                ResultPath: "$.error"
+                Next: UpdateStatus
 
           ChunksEmbedding:
             Type: Task
@@ -101,23 +107,23 @@ stepFunctions:
             Next: VectorsWriting
             Catch:
               - ErrorEquals: ["States.ALL"]
-                ResultPath: "$.errorInfo"
-                Next: UpdateStatusError
+                ResultPath: "$.error"
+                Next: UpdateStatus
 
           VectorsWriting:
             Type: Task
             Resource:
               Fn::GetAtt: [WriteVectorsLambdaFunction, Arn]
-            End: true
+            Next: UpdateStatus
             Catch:
               - ErrorEquals: ["States.ALL"]
-                ResultPath: "$.errorInfo"
-                Next: UpdateStatusError
+                ResultPath: "$.error"
+                Next: UpdateStatus
 
-          UpdateStatusError:
+          UpdateStatus:
             Type: Task
             Resource:
-              Fn::GetAtt: [ErrorLambdaFunction, Arn]
+              Fn::GetAtt: [EndLambdaFunction, Arn]
             End: true
 
       events:
