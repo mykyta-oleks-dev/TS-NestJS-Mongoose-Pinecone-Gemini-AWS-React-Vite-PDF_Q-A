@@ -14,7 +14,7 @@ import { GeneratePresignedUrlDto } from './dto/generate-presigned-url.dto';
 import { UserEmail } from '../../shared/decorators/user-email.decorator';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { UseInternalHmacGuard } from '../../shared/guards/hmac-signed.guard';
-import { UpdateStatusDto, UpdateStatusPayload } from './dto/update-status.dto';
+import { UpdateStatusDto } from './dto/update-status.dto';
 
 @Controller('documents')
 export class DocumentsController {
@@ -54,9 +54,6 @@ export class DocumentsController {
 	@Patch('status')
 	@UseInternalHmacGuard()
 	internalUpdateStatus(@Body() body: UpdateStatusDto) {
-		const payload = body as UpdateStatusPayload;
-		console.log(payload);
-
-		return payload;
+		return this.documentsService.updateStatus(body);
 	}
 }
