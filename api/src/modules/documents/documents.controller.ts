@@ -3,6 +3,7 @@ import { DocumentsService } from './documents.service';
 import { UseUserEmailGuard } from '../../shared/guards/user-email.guard';
 import { GeneratePresignedUrlDto } from './dto/generate-presigned-url.dto';
 import { UserEmail } from '../../shared/decorators/user-email.decorator';
+import { CreateDocumentDto } from './dto/create-document.dto';
 
 @Controller('documents')
 @UseUserEmailGuard()
@@ -15,5 +16,13 @@ export class DocumentsController {
 		@UserEmail() email: string,
 	) {
 		return this.documentsService.generatePutPresignedUrl(body, email);
+	}
+
+	@Post()
+	finalizeUpload(
+		@Body() body: CreateDocumentDto,
+		@UserEmail() email: string,
+	) {
+		return this.documentsService.finalizeUpload(body, email);
 	}
 }

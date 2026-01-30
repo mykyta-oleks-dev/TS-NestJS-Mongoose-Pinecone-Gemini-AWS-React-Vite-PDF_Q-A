@@ -1,4 +1,4 @@
-import { PDF_DOCUMENT_TYPE } from '../constants/document.constants';
+import { PDF_DOCUMENT_TYPE } from '../constants/files.constants';
 
 export const contentTypes = [PDF_DOCUMENT_TYPE] as const;
 

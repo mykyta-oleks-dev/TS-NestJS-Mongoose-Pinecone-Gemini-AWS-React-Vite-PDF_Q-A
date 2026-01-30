@@ -16,7 +16,7 @@ export class Document {
 	@Prop({ required: true, unique: true })
 	userEmail: string;
 
-	@Prop({ enum: statuses, required: true })
+	@Prop({ enum: statuses, required: true, default: 'pending' })
 	status: Status;
 }
 

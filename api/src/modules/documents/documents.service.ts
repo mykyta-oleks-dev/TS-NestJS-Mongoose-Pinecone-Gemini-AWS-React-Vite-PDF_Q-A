@@ -9,7 +9,12 @@ import { Model } from 'mongoose';
 import { GeneratePresignedUrlDto } from './dto/generate-presigned-url.dto';
 import { S3Service } from '../s3/s3.service';
 import { randomUUID } from 'node:crypto';
-import { MAX_FILE_SIZE } from '../../shared/constants/document.constants';
+import {
+	extensions,
+	MAX_FILE_SIZE,
+	DOCUMENTS_S3_PREFIX,
+} from '../../shared/constants/files.constants';
+import { CreateDocumentDto } from './dto/create-document.dto';
 
 @Injectable()
 export class DocumentsService {
@@ -39,7 +44,44 @@ export class DocumentsService {
 			body.size,
 		);
 
-		return { url, uuid };
+		return { url, uuid, key: tmpKey };
+	}
+
+	async finalizeUpload(body: CreateDocumentDto, email: string) {
+		await this.assertNoActiveDocument(email);
+
+		const fileHead = await this.s3.getFileHead(body.tempKey);
+
+		const { ContentType } = fileHead;
+
+		if (!ContentType) {
+			throw new Error('Content type of source file is not set');
+		}
+
+		const extension =
+			extensions.docs[ContentType as keyof typeof extensions.docs];
+
+		if (!extension) {
+			throw new BadRequestException(
+				`Unsupported content type: ${ContentType}`,
+			);
+		}
+
+		const fileName = body.fileName.endsWith(extension)
+			? body.fileName
+			: `${body.fileName}${extension}`;
+
+		const key = `${DOCUMENTS_S3_PREFIX}/${email}/${fileName}`;
+
+		await this.s3.moveFile(key, body.tempKey);
+
+		const document = await this.documentModel.create({
+			fileName,
+			key,
+			userEmail: email,
+		});
+
+		return { document };
 	}
 
 	getCurrentDocument(userEmail: string) {

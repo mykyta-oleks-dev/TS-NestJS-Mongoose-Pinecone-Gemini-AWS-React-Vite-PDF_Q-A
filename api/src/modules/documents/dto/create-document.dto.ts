@@ -1,9 +1,9 @@
-import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateDocumentDto {
 	@IsNotEmpty()
-	@IsUUID()
-	tempUuid: string;
+	@IsString()
+	tempKey: string;
 
 	@IsNotEmpty()
 	@IsString()
