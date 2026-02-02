@@ -1,9 +1,7 @@
-import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-
-export const statuses = ['pending', 'success', 'error'] as const;
-
-export type Status = (typeof statuses)[number];
+import { type Status, statuses } from '../../../shared/types/schemas.types';
+import { DocumentChatMessageDocument } from '../../chat/schemas/message.schema';
 
 @Schema()
 export class Document {
@@ -26,3 +24,21 @@ export class Document {
 export type DocumentDocument = HydratedDocument<Document>;
 
 export const DocumentSchema = SchemaFactory.createForClass(Document);
+
+DocumentSchema.pre(
+	'deleteOne',
+	{ document: false, query: true },
+	async function () {
+		const filter = this.getFilter();
+
+		const doc = await this.model.findOne<DocumentDocument>(filter);
+		if (!doc) return;
+
+		const chatMessageModel =
+			this.model.db.model<DocumentChatMessageDocument>(
+				'DocumentChatMessage',
+			);
+
+		await chatMessageModel.deleteMany({ document: doc._id });
+	},
+);

@@ -48,9 +48,9 @@ export class GeminiService {
 					{
 						text: `
 You are a helpful assistant answering questions strictly based on the provided context.
-If the answer cannot be found in the context, say that you don't know.
+The context can be given as a set of text chunks from the document (.pdf, .docx) file in the order of relevancy.
+If the answer cannot be found in the context, provide partial answer or say that you don't know.
 Do not use external knowledge.
-When answering, cite the text piece from context you used in square brackets.
 
 Context:
 ${context}

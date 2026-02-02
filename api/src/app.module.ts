@@ -17,6 +17,7 @@ import { DocumentsModule } from './modules/documents/documents.module';
 import { UserEmailMiddleware } from './shared/middlewares/user-email.middleware';
 import { PineconeModule } from './modules/pinecone/pinecone.module';
 import { GeminiModule } from './modules/gemini/gemini.module';
+import { ChatModule } from './modules/chat/chat.module';
 
 @Module({
 	imports: [
@@ -36,6 +37,7 @@ import { GeminiModule } from './modules/gemini/gemini.module';
 		}),
 		S3Module,
 		DocumentsModule,
+		ChatModule,
 		PineconeModule,
 		GeminiModule,
 	],

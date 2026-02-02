@@ -5,7 +5,7 @@ import {
 	NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Document } from './schemas/document.schema';
+import { Document, DocumentDocument } from './schemas/document.schema';
 import { Model } from 'mongoose';
 import { GeneratePresignedUrlDto } from './dto/generate-presigned-url.dto';
 import { S3Service } from '../s3/s3.service';
@@ -29,7 +29,7 @@ export class DocumentsService {
 
 	constructor(
 		@InjectModel(Document.name)
-		private readonly documentModel: Model<Document>,
+		private readonly documentModel: Model<DocumentDocument>,
 		private readonly s3: S3Service,
 		private readonly pinecone: PineconeService,
 		private readonly configService: TypedConfigService,
