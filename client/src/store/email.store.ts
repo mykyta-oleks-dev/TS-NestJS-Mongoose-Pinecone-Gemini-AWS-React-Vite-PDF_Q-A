@@ -1,12 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-type BearStore = {
+type EmailStore = {
 	email: string | undefined;
 	setEmail: (email: string | undefined) => void;
 };
 
-export const useEmailStore = create<BearStore>()(
+export const useEmailStore = create<EmailStore>()(
 	persist(
 		(set) => ({
 			email: undefined,
