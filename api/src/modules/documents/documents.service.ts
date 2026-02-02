@@ -57,7 +57,9 @@ export class DocumentsService {
 
 		const uuid = randomUUID();
 
-		const tmpKey = this.s3.getTmpKey(uuid, body.contentType);
+		const extension = extensions.docs[body.contentType];
+
+		const tmpKey = this.s3.getTmpKey(uuid, extension);
 
 		const url = await this.s3.generatePutPresignedUrl(
 			tmpKey,

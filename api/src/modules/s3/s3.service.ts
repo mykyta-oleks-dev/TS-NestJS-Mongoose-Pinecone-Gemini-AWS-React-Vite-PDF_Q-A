@@ -9,10 +9,7 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UUID } from 'node:crypto';
-import {
-	extensions,
-	TMP_S3_PREFIX,
-} from '../../shared/constants/files.constants';
+import { TMP_S3_PREFIX } from '../../shared/constants/files.constants';
 import {
 	AWSConfig,
 	TypedConfigService,
@@ -96,8 +93,8 @@ export class S3Service {
 
 	// helpers
 
-	getTmpKey(uuid: UUID, contentType: FilesContentType) {
-		return `${TMP_S3_PREFIX}/${uuid}${extensions[contentType]}`;
+	getTmpKey(uuid: UUID, extension: string) {
+		return `${TMP_S3_PREFIX}/${uuid}${extension}`;
 	}
 
 	private async tryCatch<ReturnType>(
