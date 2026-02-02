@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { Pinecone, RecordValues } from '@pinecone-database/pinecone';
+import {
+	Pinecone,
+	RecordMetadata,
+	RecordValues,
+	ScoredPineconeRecord,
+} from '@pinecone-database/pinecone';
 import {
 	PineconeConfig,
 	TypedConfigService,
@@ -21,12 +26,31 @@ export class PineconeService {
 		});
 	}
 
-	query(indexName: string, namespace: string, queryEmbedding: RecordValues) {
-		return this.client.index(indexName).namespace(namespace).query({
-			vector: queryEmbedding,
-			includeMetadata: true,
-			topK: 5,
-		});
+	async query<
+		T extends ScoredPineconeRecord<RecordMetadata> & {
+			values: RecordValues;
+		},
+	>(
+		indexName: string,
+		namespace: string,
+		queryEmbedding: RecordValues,
+
+		topK = 5,
+	) {
+		const res = await this.client
+			.index(indexName)
+			.namespace(namespace)
+			.query({
+				vector: queryEmbedding,
+				includeMetadata: true,
+				topK,
+			});
+
+		const matches = (res.matches.filter((m) => m.values) as T[]).sort(
+			(a, b) => (a.score && b.score ? b.score - a.score : 0),
+		);
+
+		return matches;
 	}
 
 	delete(indexName: string, namespace: string) {

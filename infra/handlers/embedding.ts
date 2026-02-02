@@ -22,7 +22,7 @@ const embedTextBatch = async (chunks: string[]) => {
 		contents: chunks,
 		config: {
 			outputDimensionality: 3072,
-			taskType: 'QUESTION_ANSWERING',
+			taskType: 'RETRIEVAL_DOCUMENT',
 		},
 	});
 
