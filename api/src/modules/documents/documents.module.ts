@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Document, DocumentSchema } from './schemas/document.schema';
 import { S3Module } from '../s3/s3.module';
 import { PineconeModule } from '../pinecone/pinecone.module';
+import { DocumentsEventsService } from './services/documents-events.service';
 
 @Module({
 	imports: [
@@ -15,7 +16,7 @@ import { PineconeModule } from '../pinecone/pinecone.module';
 		PineconeModule,
 	],
 	controllers: [DocumentsController],
-	providers: [DocumentsService],
+	providers: [DocumentsService, DocumentsEventsService],
 	exports: [DocumentsService],
 })
 export class DocumentsModule {}

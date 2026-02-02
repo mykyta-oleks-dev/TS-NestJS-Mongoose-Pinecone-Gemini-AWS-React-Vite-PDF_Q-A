@@ -22,6 +22,7 @@ import {
 	PineconeConfig,
 	TypedConfigService,
 } from '../../shared/types/config-service.types';
+import { DocumentsEventsService } from './services/documents-events.service';
 
 @Injectable()
 export class DocumentsService {
@@ -31,6 +32,7 @@ export class DocumentsService {
 		@InjectModel(Document.name)
 		private readonly documentModel: Model<DocumentDocument>,
 		private readonly s3: S3Service,
+		private readonly events: DocumentsEventsService,
 		private readonly pinecone: PineconeService,
 		private readonly configService: TypedConfigService,
 	) {
@@ -125,8 +127,8 @@ export class DocumentsService {
 		await this.pinecone.delete(this.documentsIndex, userEmail);
 	}
 
-	updateStatus(body: UpdateStatusDto) {
-		return this.documentModel.findOneAndUpdate(
+	async updateStatus(body: UpdateStatusDto) {
+		const document = await this.documentModel.findOneAndUpdate(
 			{
 				key: body.key,
 			},
@@ -138,6 +140,20 @@ export class DocumentsService {
 						: undefined,
 			},
 		);
+
+		if (!document) {
+			throw new NotFoundException(
+				"Document wasn't found, no updates executed",
+			);
+		}
+
+		this.events.emit({
+			id: document.id,
+			email: document.userEmail,
+			status: document.status,
+		});
+
+		return document;
 	}
 
 	// helpers

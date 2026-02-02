@@ -7,6 +7,8 @@ import {
 	HttpStatus,
 	Patch,
 	Post,
+	Query,
+	Sse,
 } from '@nestjs/common';
 import { DocumentsService } from './documents.service';
 import { UseUserEmailGuard } from '../../shared/guards/user-email.guard';
@@ -15,10 +17,15 @@ import { UserEmail } from '../../shared/decorators/user-email.decorator';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { UseInternalHmacGuard } from '../../shared/guards/hmac-signed.guard';
 import { UpdateStatusDto } from './dto/update-status.dto';
+import { DocumentsEventsService } from './services/documents-events.service';
+import { filter, map } from 'rxjs';
 
 @Controller('documents')
 export class DocumentsController {
-	constructor(private readonly documentsService: DocumentsService) {}
+	constructor(
+		private readonly documentsService: DocumentsService,
+		private readonly events: DocumentsEventsService,
+	) {}
 
 	@Post('presigned-url')
 	@UseUserEmailGuard()
@@ -55,5 +62,15 @@ export class DocumentsController {
 	@UseInternalHmacGuard()
 	internalUpdateStatus(@Body() body: UpdateStatusDto) {
 		return this.documentsService.updateStatus(body);
+	}
+
+	@Sse('events')
+	public documentsEvents(@Query('email') email: string) {
+		return this.events.asObservable().pipe(
+			filter((e) => e.email === email),
+			map((event) => ({
+				data: event,
+			})),
+		);
 	}
 }
