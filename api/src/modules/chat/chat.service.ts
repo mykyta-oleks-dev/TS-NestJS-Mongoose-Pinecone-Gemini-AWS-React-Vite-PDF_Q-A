@@ -36,7 +36,8 @@ export class ChatService {
 	}
 
 	async askOnDocument(email: string, question: string) {
-		const document = await this.documents.getCurrentDocument(email);
+		const document =
+			await this.documents.getCurrentDocumentIfSuccess(email);
 
 		const vectorQuestion = await this.embedQuestion(question);
 
@@ -55,7 +56,8 @@ export class ChatService {
 	}
 
 	async getMessages(email: string) {
-		const document = await this.documents.getCurrentDocument(email);
+		const document =
+			await this.documents.getCurrentDocumentIfSuccess(email);
 
 		return this.chatMessageModel
 			.find({

@@ -155,4 +155,22 @@ export class DocumentsService {
 			throw new ConflictException('User already has document uploaded');
 		}
 	}
+
+	async getCurrentDocumentIfSuccess(userEmail: string) {
+		const document = await this.getCurrentDocument(userEmail);
+
+		if (document.status === 'pending') {
+			throw new BadRequestException(
+				'Please wait, the document is being processed',
+			);
+		}
+
+		if (document.status === 'error') {
+			throw new Error(
+				'There was an error in processing, further access is impossible',
+			);
+		}
+
+		return document;
+	}
 }
