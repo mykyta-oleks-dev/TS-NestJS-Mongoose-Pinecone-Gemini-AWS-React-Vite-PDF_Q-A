@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@plugin '@tailwindcss/typography';
 @import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
@@ -124,4 +125,12 @@
 
 #root {
 	@apply h-screen;
+}
+
+.answer {
+	@apply prose text-gray-200;
+}
+
+.answer * {
+	@apply text-gray-200!;
 }

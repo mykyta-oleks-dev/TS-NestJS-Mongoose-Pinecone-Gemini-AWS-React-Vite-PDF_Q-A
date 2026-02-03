@@ -26,6 +26,7 @@ export function useDeleteDocument() {
 
 		onSettled: () => {
 			qc.setQueryData<Document | null>(queryKey, () => null);
+			qc.invalidateQueries({ queryKey: ['chat'], exact: false });
 
 			toast.success('The file was deleted successfuly!');
 		},

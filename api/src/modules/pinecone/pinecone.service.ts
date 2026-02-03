@@ -35,7 +35,7 @@ export class PineconeService {
 		namespace: string,
 		queryEmbedding: RecordValues,
 
-		topK = 5,
+		topK = 10,
 	) {
 		const res = await this.client
 			.index(indexName)

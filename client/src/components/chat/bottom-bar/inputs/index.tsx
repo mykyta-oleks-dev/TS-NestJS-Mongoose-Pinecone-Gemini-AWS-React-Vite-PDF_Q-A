@@ -1,5 +1,5 @@
 import FileInput from './file';
-import Message from './message';
+import Message from './message-input';
 
 const Inputs = () => {
 	return (

@@ -11,6 +11,7 @@ const FileInput = () => {
 	} = useCurrentDocument();
 
 	if (queryError) {
+		console.log('error');
 		toast.error(`Failed to load the ${queryError.message}`);
 	}
 

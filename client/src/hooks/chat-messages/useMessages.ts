@@ -1,21 +1,18 @@
-import { getDocument } from '@/api/documents';
+import { getMessages } from '@/api/chat';
 import { useEmailStore } from '@/store/email.store';
+import type { Document } from '@/types/document.types';
 import { useQuery } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 
-export const useCurrentDocument = () => {
+export const useMessages = (document?: Document | null) => {
 	const email = useEmailStore((s) => s.email);
 
 	return useQuery({
-		enabled: !!email,
-		queryKey: ['documents', email],
-		retry: (_failureCount, error) =>
-			!(isAxiosError(error) && error.response?.status === 404),
+		queryKey: ['chat', email],
+		enabled: !!email && !!document,
 		queryFn: async () => {
-			if (!email) return;
-
 			try {
-				return await getDocument();
+				return await getMessages();
 			} catch (err) {
 				if (isAxiosError(err) && err.response?.status === 404) {
 					return null;

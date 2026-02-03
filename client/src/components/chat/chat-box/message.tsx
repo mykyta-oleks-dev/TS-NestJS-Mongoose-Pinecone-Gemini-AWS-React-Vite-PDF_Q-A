@@ -1,4 +1,6 @@
 import type { AppMessage } from '@/types/message.types';
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const MessageBox = ({ message }: { message: AppMessage }) => {
 	return (
@@ -6,9 +8,11 @@ const MessageBox = ({ message }: { message: AppMessage }) => {
 			<p className="text-right mb-3 bg-gray-800 py-1 px-2 rounded-md">
 				{message.question}
 			</p>
-			<div className="mb-1 bg-gray-900 py-1 px-2 rounded-md">
+			<div className="mb-1 bg-gray-900 py-1 px-2 rounded-md answer max-w-full!">
 				{message.answer ? (
-					<div>{message.answer}</div>
+					<Markdown remarkPlugins={[remarkGfm]}>
+						{message.answer}
+					</Markdown>
 				) : (
 					<>Please wait...</>
 				)}
