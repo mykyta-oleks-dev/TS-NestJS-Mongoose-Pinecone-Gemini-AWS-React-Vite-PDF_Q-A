@@ -12,13 +12,13 @@ export const useCurrentDocument = () => {
 		retry: (_failureCount, error) =>
 			!(isAxiosError(error) && error.response?.status === 404),
 		queryFn: async () => {
-			if (!email) return;
+			if (!email) return null;
 
 			try {
 				return await getDocument();
 			} catch (err) {
 				if (isAxiosError(err) && err.response?.status === 404) {
-					return;
+					return null;
 				}
 
 				throw err;

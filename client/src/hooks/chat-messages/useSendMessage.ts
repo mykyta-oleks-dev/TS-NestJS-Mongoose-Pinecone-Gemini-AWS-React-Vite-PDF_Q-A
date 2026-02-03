@@ -5,7 +5,7 @@ import type { AppMessage } from '@/types/message.types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-export const useSendMessage = (document: Document | undefined) => {
+export const useSendMessage = (document?: Document | null) => {
 	const email = useEmailStore((s) => s.email);
 	const qc = useQueryClient();
 
