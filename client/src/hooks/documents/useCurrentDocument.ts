@@ -18,7 +18,7 @@ export const useCurrentDocument = () => {
 				return await getDocument();
 			} catch (err) {
 				if (isAxiosError(err) && err.response?.status === 404) {
-					return null;
+					return;
 				}
 
 				throw err;
