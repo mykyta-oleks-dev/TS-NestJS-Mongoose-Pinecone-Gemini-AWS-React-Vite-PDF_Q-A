@@ -19,17 +19,17 @@ provider:
   region: us-east-1
   stage: dev
   environment:
-    PDF_BUCKET_NAME: mykyo-${self:service}-${self:provider.stage}
+    PDF_BUCKET_NAME: mykyo-${self:service}-${opt:stage, self:provider.stage}
 
-    GEMINI_API_KEY: ${ssm:/infra/${self:provider.stage}/gemini/apiKey}
+    GEMINI_API_KEY: ${ssm:/infra/${opt:stage, self:provider.stage}/gemini/apiKey}
 
-    PINECONE_API_KEY: ${ssm:/infra/${self:provider.stage}/pinecone/apiKey}
-    PINECONE_INDEX: pdf-rag-${self:provider.stage}
+    PINECONE_API_KEY: ${ssm:/infra/${opt:stage, self:provider.stage}/pinecone/apiKey}
+    PINECONE_INDEX: pdf-rag-${opt:stage, self:provider.stage}
 
-    HMAC_SECRET: ${ssm:/infra/${self:provider.stage}/hmac}
+    HMAC_SECRET: ${ssm:/infra/${opt:stage, self:provider.stage}/hmac}
 
-    API_URL: ${ssm:/infra/${self:provider.stage}/apiUrl}
-    CLIENT_URL: ${ssm:/infra/${self:provider.stage}/clientUrl}
+    API_URL: ${ssm:/infra/${opt:stage, self:provider.stage}/apiUrl}
+    CLIENT_URL: ${ssm:/infra/${opt:stage, self:provider.stage}/clientUrl}
 
   iam:
     role:
@@ -47,10 +47,11 @@ provider:
           Action:
             - ssm:GetParameter
           Resource:
-            - arn:aws:ssm:${self:provider.region}:*:parameter/infra/${self:provider.stage}/gemini/*
-            - arn:aws:ssm:${self:provider.region}:*:parameter/infra/${self:provider.stage}/pinecone/*
-            - arn:aws:ssm:${self:provider.region}:*:parameter/infra/${self:provider.stage}/hmac
-            - arn:aws:ssm:${self:provider.region}:*:parameter/infra/${self:provider.stage}/apiUrl
+            - arn:aws:ssm:${self:provider.region}:*:parameter/infra/${opt:stage, self:provider.stage}/gemini/*
+            - arn:aws:ssm:${self:provider.region}:*:parameter/infra/${opt:stage, self:provider.stage}/pinecone/*
+            - arn:aws:ssm:${self:provider.region}:*:parameter/infra/${opt:stage, self:provider.stage}/hmac
+            - arn:aws:ssm:${self:provider.region}:*:parameter/infra/${opt:stage, self:provider.stage}/apiUrl
+            - arn:aws:ssm:${self:provider.region}:*:parameter/infra/${opt:stage, self:provider.stage}/clientUrl
 
 functions:
   extractText:
@@ -77,7 +78,7 @@ functions:
 stepFunctions:
   stateMachines:
     PdfProcessingStateMachine:
-      name: pdf-processing-${self:provider.stage}
+      name: pdf-processing-${opt:stage, self:provider.stage}
       definition:
         StartAt: ExtractText
         States:
