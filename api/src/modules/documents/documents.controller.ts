@@ -10,15 +10,16 @@ import {
 	Query,
 	Sse,
 } from '@nestjs/common';
-import { DocumentsService } from './documents.service';
-import { UseUserEmailGuard } from '../../shared/guards/user-email.guard';
-import { GeneratePresignedUrlDto } from './dto/generate-presigned-url.dto';
+import { filter, map } from 'rxjs';
 import { UserEmail } from '../../shared/decorators/user-email.decorator';
-import { CreateDocumentDto } from './dto/create-document.dto';
 import { UseInternalHmacGuard } from '../../shared/guards/hmac-signed.guard';
+import { UseUserEmailGuard } from '../../shared/guards/user-email.guard';
+import { DocumentsService } from './documents.service';
+import { CreateDocumentDto } from './dto/create-document.dto';
+import { GeneratePresignedUrlDto } from './dto/generate-presigned-url.dto';
 import { UpdateStatusDto } from './dto/update-status.dto';
 import { DocumentsEventsService } from './services/documents-events.service';
-import { filter, map } from 'rxjs';
+import { SseQueryDto } from './dto/sse.query.dto';
 
 @Controller('documents')
 export class DocumentsController {
@@ -65,7 +66,7 @@ export class DocumentsController {
 	}
 
 	@Sse('events')
-	public documentsEvents(@Query('email') email: string) {
+	public documentsEvents(@Query() { email }: SseQueryDto) {
 		return this.events.asObservable().pipe(
 			filter((e) => e.email === email),
 			map((event) => ({

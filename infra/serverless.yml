@@ -29,6 +29,7 @@ provider:
     HMAC_SECRET: ${ssm:/infra/${self:provider.stage}/hmac}
 
     API_URL: ${ssm:/infra/${self:provider.stage}/apiUrl}
+    CLIENT_URL: ${ssm:/infra/${self:provider.stage}/clientUrl}
 
   iam:
     role:
@@ -148,6 +149,19 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:provider.environment.PDF_BUCKET_NAME}
+        CorsConfiguration:
+          CorsRules:
+            - AllowedOrigins:
+                - ${self:provider.environment.CLIENT_URL}
+              AllowedMethods:
+                - PUT
+                - GET
+                - HEAD
+              AllowedHeaders:
+                - "*"
+              ExposedHeaders:
+                - ETag
+              MaxAge: 3000
         LifecycleConfiguration:
           Rules:
             - Id: TmpExpiration

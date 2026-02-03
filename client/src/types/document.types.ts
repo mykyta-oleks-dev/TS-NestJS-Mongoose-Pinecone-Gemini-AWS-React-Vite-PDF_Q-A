@@ -12,3 +12,9 @@ export interface Document {
 	status: Status;
 	vectorsCount?: number;
 }
+
+export interface DocumentStatusEvent {
+	id: string;
+	email: string;
+	status: Status;
+}

@@ -23,6 +23,7 @@ import {
 	TypedConfigService,
 } from '../../shared/types/config-service.types';
 import { DocumentsEventsService } from './services/documents-events.service';
+import { Status } from '../../shared/types/schemas.types';
 
 @Injectable()
 export class DocumentsService {
@@ -130,29 +131,28 @@ export class DocumentsService {
 	}
 
 	async updateStatus(body: UpdateStatusDto) {
-		const document = await this.documentModel.findOneAndUpdate(
-			{
-				key: body.key,
-			},
-			{
-				status: body.success ? 'success' : 'error',
-				vectorsCount:
-					body.success && body.vectorsCount
-						? body.vectorsCount
-						: undefined,
-			},
-		);
+		const document = await this.documentModel.findOne({ key: body.key });
 
 		if (!document) {
 			throw new NotFoundException(
-				"Document wasn't found, no updates executed",
+				'There is no document uploaded by the user',
 			);
 		}
+
+		const status: Status = body.success ? 'success' : 'error';
+
+		await document.updateOne({
+			status,
+			vectorsCount:
+				body.success && body.vectorsCount
+					? body.vectorsCount
+					: undefined,
+		});
 
 		this.events.emit({
 			id: document.id,
 			email: document.userEmail,
-			status: document.status,
+			status,
 		});
 
 		return document;

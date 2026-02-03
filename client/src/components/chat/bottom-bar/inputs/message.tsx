@@ -4,11 +4,15 @@ import {
 	InputGroupButton,
 	InputGroupTextarea,
 } from '@/components/ui/input-group';
-import { useUploadedFileStore } from '@/store/uploaded.store';
+import { useCurrentDocument } from '@/hooks/documents/useCurrentDocument';
 import { CircleXIcon, SendIcon } from 'lucide-react';
 
 const Message = () => {
-	const document = useUploadedFileStore((s) => s.document);
+	const { data: document, error } = useCurrentDocument();
+
+	if (error) {
+		return <div>An unexpected error happened: {error.message}</div>;
+	}
 
 	const isProcessed = document?.status === 'success';
 
