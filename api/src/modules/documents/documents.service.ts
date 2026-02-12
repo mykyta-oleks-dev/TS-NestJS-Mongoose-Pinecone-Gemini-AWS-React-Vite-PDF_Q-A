@@ -24,6 +24,7 @@ import {
 } from '../../shared/types/config-service.types';
 import { DocumentsEventsService } from './services/documents-events.service';
 import { Status } from '../../shared/types/schemas.types';
+import { PineconeNotFoundError } from '@pinecone-database/pinecone/dist/errors';
 
 @Injectable()
 export class DocumentsService {
@@ -127,7 +128,15 @@ export class DocumentsService {
 
 		await this.documentModel.deleteOne({ userEmail });
 
-		await this.pinecone.delete(this.documentsIndex, userEmail);
+		try {
+			await this.pinecone.delete(this.documentsIndex, userEmail);
+		} catch (err: unknown) {
+			if (err instanceof PineconeNotFoundError) {
+				console.log('No existing vectors to delete');
+			} else {
+				throw err;
+			}
+		}
 	}
 
 	async updateStatus(body: UpdateStatusDto) {
@@ -135,7 +144,7 @@ export class DocumentsService {
 
 		if (!document) {
 			throw new NotFoundException(
-				'There is no document uploaded by the user',
+				'There is no document uploaded by the user (failed to upload or already deleted)',
 			);
 		}
 

@@ -67,7 +67,7 @@ export const useUploadDocument = () => {
 			qc.invalidateQueries({ queryKey: ['documents'] });
 
 			toast.success(
-				'The document is successfuly uploaded and saved! Please wait for its processing',
+				'The document is successfuly uploaded and saved! Please wait for its processing. Processing might take a few minutes for large files or during peak hours.',
 			);
 		},
 	});

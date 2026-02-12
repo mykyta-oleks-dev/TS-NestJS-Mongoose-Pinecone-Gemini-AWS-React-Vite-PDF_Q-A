@@ -18,7 +18,8 @@ export const handler = async (event: EndStateInput) => {
 		'key' in event ? event.key : (event.detail.object.key as string);
 
 	const { error: errorRaw, vectorsCount } = event;
-	const error = errorRaw ? JSON.parse(errorRaw) : undefined;
+	const error =
+		typeof errorRaw === 'string' ? JSON.parse(errorRaw) : errorRaw;
 
 	const success = !error;
 

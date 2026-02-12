@@ -1,5 +1,5 @@
 export type EndStateInput = {
-	error?: string;
+	error?: string | object;
 	vectorsCount: number;
 } & (
 	| {

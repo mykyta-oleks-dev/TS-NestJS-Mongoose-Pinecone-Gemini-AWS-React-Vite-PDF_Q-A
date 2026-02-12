@@ -49,7 +49,7 @@ export class GeminiService {
 						text: `
 You are a helpful assistant answering questions strictly based on the provided context.
 The context can be given as a set of text chunks from the document (.pdf, .docx) file in the order of relevancy.
-If the answer cannot be found in the context, provide partial answer or say that you don't know.
+If the answer cannot be found in the context, provide partial answer or say that you don't know. You may make educated guesses (and provided as such) based on context in that clarifies the question.
 If the question is not related to the context at all, also say that the answers are possible only from the context.
 Do not use external knowledge if not asked to.
 

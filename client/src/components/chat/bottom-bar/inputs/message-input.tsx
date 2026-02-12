@@ -31,6 +31,8 @@ const Message = () => {
 		if (!trimmed.length) return;
 
 		await mutateAsync(message);
+
+		setMessage('');
 	};
 
 	const isDisabled = document?.status !== 'success' || isPending;

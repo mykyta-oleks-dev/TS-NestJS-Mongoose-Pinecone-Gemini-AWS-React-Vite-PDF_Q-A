@@ -66,11 +66,7 @@ functions:
 
   embedding:
     handler: handlers/embedding.handler
-    timeout: 120
-
-  writeVectors:
-    handler: handlers/pinecone.handler
-    timeout: 120
+    timeout: 900
 
   end:
     handler: handlers/end.handler
@@ -106,16 +102,6 @@ stepFunctions:
             Type: Task
             Resource:
               Fn::GetAtt: [EmbeddingLambdaFunction, Arn]
-            Next: VectorsWriting
-            Catch:
-              - ErrorEquals: ["States.ALL"]
-                ResultPath: "$.error"
-                Next: UpdateStatus
-
-          VectorsWriting:
-            Type: Task
-            Resource:
-              Fn::GetAtt: [WriteVectorsLambdaFunction, Arn]
             Next: UpdateStatus
             Catch:
               - ErrorEquals: ["States.ALL"]
